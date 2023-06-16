@@ -50,7 +50,7 @@ beforeEach(async () => {
     // Login um Token zu erhalten
     const request = supertest(app);
     const loginData = { email: "john@doe.de", password: "123asdf!ABCD" };
-    const response = await request.post(`/login`).send(loginData);
+    const response = await request.post(`/api/login`).send(loginData);
     const loginResource = response.body as LoginResource;
     token = loginResource.access_token;
     expect(token).toBeDefined()
@@ -62,7 +62,7 @@ afterAll(async () => {
 
 test("shopitems GET, Positivtest logged in users non public list", async () => {
     const request = supertest(app);
-    const response = await request.get(`/shoplist/${shopListId}/shopitems`)
+    const response = await request.get(`/api/shoplist/${shopListId}/shopitems`)
         .set("Authorization", `Bearer ${token}`)
     expect(response.statusCode).toBe(200);
 
@@ -74,28 +74,28 @@ test("shopitems GET, Positivtest logged in users non public list", async () => {
 
 test("shopitems GET, logged in user tries to access private list of someone else,negative ", async () => {
     const request = supertest(app);
-    const response = await request.get(`/shoplist/${maxprvtid}/shopitems`)
+    const response = await request.get(`/api/shoplist/${maxprvtid}/shopitems`)
         .set("Authorization", `Bearer ${token}`)
     expect(response.statusCode).toBe(403);
 });
 
 test("shopitems GET, nicht existierende ShopList-ID", async () => {
     const request = supertest(app);
-    const response = await request.get(`/shoplist/${NON_EXISTING_ID}/shopitems`)
+    const response = await request.get(`/api/shoplist/${NON_EXISTING_ID}/shopitems`)
         .set("Authorization", `Bearer ${token}`)
     expect(response.statusCode).toBe(404);
 });
 
 test("shopitems GET, no valid mongoID", async () => {
     const request = supertest(app);
-    const response = await request.get(`/shoplist/${"noID"}/shopitems`)
+    const response = await request.get(`/api/shoplist/${"noID"}/shopitems`)
         .set("Authorization", `Bearer ${token}`)
     expect(response).toHaveValidationErrorsExactly({ params: "id" })
 });
 
 test("shopitems GET, no authentication", async () => {
     const request = supertest(app);
-    const response = await request.get(`/shoplist/${shopListId}/shopitems`)
+    const response = await request.get(`/api/shoplist/${shopListId}/shopitems`)
         .set("Authorization", `Bearer ${undefined}`)
     expect(response).not.statusCode(400);
     expect(response).not.statusCode(404);

@@ -24,7 +24,7 @@ beforeEach(async () => {
     // Login um Token zu erhalten
     const request = supertest(app);
     const loginData = { email: "john@doe.de", password: "123asdf!ABCD" };
-    const response = await request.post(`/login`).send(loginData);
+    const response = await request.post(`/api/login`).send(loginData);
     const loginResource = response.body as LoginResource;
     token = loginResource.access_token;
     expect(token).toBeDefined();
@@ -39,7 +39,7 @@ describe("shopitem POST", () => {
     test("Positivetest", async () => {
         const request = supertest(app)
         const holz: ShopItemResource = { creator: john.id!, shopList: johnList.id!, name: "Holz", quantity: "111" }
-        const response = await request.post(`/shopitem`)
+        const response = await request.post(`/api/shopitem`)
             .set("Authorization", `Bearer ${token}`)
             .send(holz)
 
@@ -55,7 +55,7 @@ describe("shopitem POST", () => {
     test("Negativetest invalid creator ID", async () => {
         const request = supertest(app)
         const holz: ShopItemResource = { creator: NON_EXISTING_ID, shopList: johnList.id!, name: "Holz", quantity: "111" }
-        const response = await request.post(`/shopitem`)
+        const response = await request.post(`/api/shopitem`)
             .set("Authorization", `Bearer ${token}`)
             .send(holz)
         expect(response.statusCode).toBe(400)
@@ -66,7 +66,7 @@ describe("shopitem POST", () => {
         let max = await createUser({ name: "Max", email: "max@doe.de", password: "123asdf!ABCD", admin: false })
         let maxList = await createShopList({ creator: max.id!, store: "LIDL", public: false })
         const holz: ShopItemResource = { creator: john.id!, shopList: maxList.id!, name: "Holz", quantity: "111" }
-        const response = await request.post(`/shopitem`)
+        const response = await request.post(`/api/shopitem`)
             .set("Authorization", `Bearer ${token}`)
             .send(holz)
             expect(response.statusCode).toBe(403)
@@ -77,7 +77,7 @@ describe("shopitem POST", () => {
         let max = await createUser({ name: "Max", email: "max@doe.de", password: "123asdf!ABCD", admin: false })
         let maxList = await createShopList({ creator: max.id!, store: "LIDL", public: true })
         const holz: ShopItemResource = { creator: john.id!, shopList: maxList.id!, name: "Holz", quantity: "111" }
-        const response = await request.post(`/shopitem`)
+        const response = await request.post(`/api/shopitem`)
             .set("Authorization", `Bearer ${token}`)
             .send(holz)
             expect(response.statusCode).toBe(201)
@@ -88,7 +88,7 @@ describe("shopitem GET", () => {
 
     test("Positivetest", async () => {
         const request = supertest(app)
-        const response = await request.get(`/shopitem/${wasser.id}`)
+        const response = await request.get(`/api/shopitem/${wasser.id}`)
             .set("Authorization", `Bearer ${token}`)
         expect(response.statusCode).toBe(200)
 
@@ -98,7 +98,7 @@ describe("shopitem GET", () => {
 
     test("negativetest ID not found", async () => {
         const request = supertest(app)
-        const response = await request.get(`/shopitem/${NON_EXISTING_ID}`)
+        const response = await request.get(`/api/shopitem/${NON_EXISTING_ID}`)
             .set("Authorization", `Bearer ${token}`)
         expect(response.statusCode).toBe(404)
     })
@@ -109,7 +109,7 @@ describe("shopitem GET", () => {
         let maxList = await createShopList({ creator: max.id!, store: "LIDL", public: true })
         let milch = await createShopItem({ creator: max.id!, shopList: maxList.id!, name: "Milch", quantity: "200" })
 
-        const response = await request.get(`/shopitem/${milch.id}`)
+        const response = await request.get(`/api/shopitem/${milch.id}`)
             .set("Authorization", `Bearer ${token}`)
             expect(response.statusCode).toBe(200)
     })
@@ -120,7 +120,7 @@ describe("shopitem GET", () => {
         let maxList = await createShopList({ creator: max.id!, store: "LIDL", public: false })
         let milch = await createShopItem({ creator: max.id!, shopList: maxList.id!, name: "Milch", quantity: "200" })
 
-        const response = await request.get(`/shopitem/${milch.id}`)
+        const response = await request.get(`/api/shopitem/${milch.id}`)
             .set("Authorization", `Bearer ${token}`)
             expect(response.statusCode).toBe(403)
     })
@@ -131,7 +131,7 @@ describe("shopitem GET", () => {
         let maxList = await createShopList({ creator: max.id!, store: "LIDL", public: false })
         let milch = await createShopItem({ creator: max.id!, shopList: johnList.id!, name: "Milch", quantity: "200" })
 
-        const response = await request.get(`/shopitem/${milch.id}`)
+        const response = await request.get(`/api/shopitem/${milch.id}`)
             .set("Authorization", `Bearer ${token}`)
             expect(response.statusCode).toBe(200)
     })
@@ -142,7 +142,7 @@ describe("shopitem GET", () => {
         let maxList = await createShopList({ creator: max.id!, store: "LIDL", public: false })
         let milch = await createShopItem({ creator: john.id!, shopList: maxList.id!, name: "Milch", quantity: "200" })
 
-        const response = await request.get(`/shopitem/${milch.id}`)
+        const response = await request.get(`/api/shopitem/${milch.id}`)
             .set("Authorization", `Bearer ${token}`)
             expect(response.statusCode).toBe(200)
     })
@@ -154,7 +154,7 @@ describe("shopitem PUT", () => {
         const request = supertest(app)
         const update: ShopItemResource = { id: wasser.id, creator: john.id!, shopList: johnList.id!, name: "Holz", quantity: "200" }
 
-        const response = await request.put(`/shopitem/${update.id}`)
+        const response = await request.put(`/api/shopitem/${update.id}`)
             .set("Authorization", `Bearer ${token}`)
             .send(update)
 
@@ -169,7 +169,7 @@ describe("shopitem PUT", () => {
         const request = supertest(app);
         const update: ShopItemResource = { id: wasser.id, creator: john.id!, shopList: johnList.id!, name: "Holz", quantity: "200" }
 
-        const response = await request.put(`/shopitem/${NON_EXISTING_ID}`)
+        const response = await request.put(`/api/shopitem/${NON_EXISTING_ID}`)
             .set("Authorization", `Bearer ${token}`)
             .send(update)
         expect(response.statusCode).toBe(400)
@@ -179,7 +179,7 @@ describe("shopitem PUT", () => {
         const request = supertest(app)
         const update: ShopItemResource = { creator: NON_EXISTING_ID, shopList: johnList.id!, name: "Holz", quantity: "200" }
 
-        const response = await request.put(`/shoplist/${update.id}`)
+        const response = await request.put(`/api/shoplist/${update.id}`)
             .set("Authorization", `Bearer ${token}`)
             .send(update)
         expect(response.statusCode).toBe(400)
@@ -193,7 +193,7 @@ describe("shopitem PUT", () => {
 
         const update: ShopItemResource = { id: milch.id, creator: max.id!, shopList: maxList.id!, name: "Holz", quantity: "200" }
 
-        const response = await request.put(`/shopitem/${update.id}`)
+        const response = await request.put(`/api/shopitem/${update.id}`)
             .set("Authorization", `Bearer ${token}`)
             .send(update)
 
@@ -208,7 +208,7 @@ describe("shopitem PUT", () => {
 
         const update: ShopItemResource = { id: milch.id, creator: max.id!, shopList: johnList.id!, name: "Holz", quantity: "200" }
 
-        const response = await request.put(`/shopitem/${update.id}`)
+        const response = await request.put(`/api/shopitem/${update.id}`)
             .set("Authorization", `Bearer ${token}`)
             .send(update)
 
@@ -222,7 +222,7 @@ describe("shopitem PUT", () => {
 
         const update: ShopItemResource = { id: milch.id, creator: max.id!, shopList: maxList.id!, name: "Holz", quantity: "200" }
 
-        const response = await request.put(`/shopitem/${update.id}`)
+        const response = await request.put(`/api/shopitem/${update.id}`)
             .set("Authorization", `Bearer ${token}`)
             .send(update)
 
@@ -237,7 +237,7 @@ describe("shopitem PUT", () => {
 
         const update: ShopItemResource = { id: milch.id, creator: max.id!, shopList: johnList.id!, name: "Holz", quantity: "200" }
 
-        const response = await request.put(`/shopitem/${update.id}`)
+        const response = await request.put(`/api/shopitem/${update.id}`)
             .set("Authorization", `Bearer ${token}`)
             .send(update)
 
@@ -249,7 +249,7 @@ describe("shopitem DELETE", () => {
 
     test("Positivtest", async () => {
         const request = supertest(app);
-        const response = await request.delete(`/shopitem/${wasser.id}`)
+        const response = await request.delete(`/api/shopitem/${wasser.id}`)
             .set("Authorization", `Bearer ${token}`)
 
         expect(response.statusCode).toBe(204)
@@ -257,7 +257,7 @@ describe("shopitem DELETE", () => {
 
     test("Negativetest non existend ID", async () => {
         const request = supertest(app)
-        const response = await request.delete(`/shopitem/${NON_EXISTING_ID}`)
+        const response = await request.delete(`/api/shopitem/${NON_EXISTING_ID}`)
             .set("Authorization", `Bearer ${token}`)
 
         expect(response.statusCode).toBe(400)
@@ -269,7 +269,7 @@ describe("shopitem DELETE", () => {
         let maxList = await createShopList({ creator: max.id!, store: "LIDL", public: true })
         let milch = await createShopItem({ creator: max.id!, shopList: maxList.id!, name: "Milch", quantity: "200" })
        
-        const response = await request.delete(`/shopitem/${milch.id}`)
+        const response = await request.delete(`/api/shopitem/${milch.id}`)
             .set("Authorization", `Bearer ${token}`)
 
         expect(response.statusCode).toBe(403)
@@ -281,7 +281,7 @@ describe("shopitem DELETE", () => {
         let maxList = await createShopList({ creator: max.id!, store: "LIDL", public: true })
         let milch = await createShopItem({ creator: max.id!, shopList: johnList.id!, name: "Milch", quantity: "200" })
        
-        const response = await request.delete(`/shopitem/${milch.id}`)
+        const response = await request.delete(`/api/shopitem/${milch.id}`)
             .set("Authorization", `Bearer ${token}`)
 
         expect(response.statusCode).toBe(204)
@@ -293,7 +293,7 @@ describe("shopitem DELETE", () => {
         let maxList = await createShopList({ creator: max.id!, store: "LIDL", public: true })
         let milch = await createShopItem({ creator: john.id!, shopList: maxList.id!, name: "Milch", quantity: "200" })
        
-        const response = await request.delete(`/shopitem/${milch.id}`)
+        const response = await request.delete(`/api/shopitem/${milch.id}`)
             .set("Authorization", `Bearer ${token}`)
 
         expect(response.statusCode).toBe(204)
@@ -304,7 +304,7 @@ describe("shopitem Auth", () => {
 
     test("Undefined token", async () => {
         const request = supertest(app)
-        const response = await request.delete(`/shopitem/${wasser.id}`)
+        const response = await request.delete(`/api/shopitem/${wasser.id}`)
             .set("Authorization", `Bearer ${undefined}`)
         expect(response).not.statusCode(400);
         expect(response).not.statusCode(404);

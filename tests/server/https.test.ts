@@ -71,7 +71,7 @@ test("https test", async () => {
         });
         // get that nice board
         const request = supertest(httpsServer);
-        const response = await request.get(`/shopper`);
+        const response = await request.get(`/api/shopper`);
         expect(response.statusCode).toBe(200);
         const shopperRes: ShopperResource = response.body;
         expect(shopperRes.shopLists.length).toBe(4)

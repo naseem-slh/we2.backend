@@ -27,7 +27,7 @@ beforeEach(async () => {
     // Login um Token zu erhalten
     const request = supertest(app);
     const loginData = { email: "john@doe.de", password: "123asdf!ABCD"};
-    const response = await request.post(`/login`).send(loginData);
+    const response = await request.post(`/api/login`).send(loginData);
     const loginResource = response.body as LoginResource;
     token = loginResource.access_token;
     expect(token).toBeDefined();
@@ -45,7 +45,7 @@ test("shopper GET, Positivetest returns public lists and johns list", async () =
     const shopLists: ShopperResource = { shopLists: [] }
     shopLists.shopLists.push( nonPublicList,publicList, publicListMax)
 
-    const response = await request.get("/shopper")
+    const response = await request.get("/api/shopper")
     .set("Authorization", `Bearer ${token}`)
     expect(response.statusCode).toBe(200)
 
@@ -58,7 +58,7 @@ test("shopper GET, Positivetest no authentication, returns only public lists", a
     const shopLists: ShopperResource = { shopLists: [] }
     shopLists.shopLists.push(publicList, publicListMax)
 
-    const response = await request.get("/shopper")
+    const response = await request.get("/api/shopper")
     expect(response.statusCode).toBe(200)
 
     const res = response.body as ShopperResource
@@ -69,7 +69,7 @@ test("shopper GET, deleted public lists", async () => {
     const request = supertest(app)
     await deleteShopList(publicList.id!)
     await deleteShopList(publicListMax.id!)
-    const response = await request.get("/shopper")
+    const response = await request.get("/api/shopper")
     const res = response.body as ShopperResource
     expect(res.shopLists.length).toBe(0)
 })

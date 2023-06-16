@@ -22,7 +22,7 @@ beforeEach(async () => {
     // Login um Token zu erhalten
     const request = supertest(app);
     const loginData = { email: "john@some-host.de", password: "123asdf!ABCD"};
-    const response = await request.post(`/login`).send(loginData);
+    const response = await request.post(`/api/login`).send(loginData);
     const loginResource = response.body as LoginResource;
     token = loginResource.access_token;
     expect(token).toBeDefined();
@@ -35,14 +35,14 @@ afterAll(async () => {
 test("delete shoplist -- without authorization: 401", async ()=>{
     const request = supertest(app);
     const response = await request
-        .delete(`/shoplist/${NON_EXISTING_ID}`)
+        .delete(`/api/shoplist/${NON_EXISTING_ID}`)
     expect(response).statusCode("401");
 })
 
 test("delete shoplist -- with authorization: not 401", async ()=>{
     const request = supertest(app);
     const response = await request
-        .delete(`/shoplist/${NON_EXISTING_ID}`)
+        .delete(`/api/shoplist/${NON_EXISTING_ID}`)
         .set("Authorization", `Bearer ${token}`) // setzen des Tokens mit Authentifizierung
     expect(response).not.statusCode("401");
     expect(response).not.statusCode("403");

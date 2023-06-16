@@ -28,7 +28,7 @@ beforeEach(async () => {
     // Login um Token zu erhalten
     const request = supertest(app);
     const loginData = { email: "john@some-host.de", password: "123asdf!ABCD" };
-    const response = await request.post(`/login`).send(loginData);
+    const response = await request.post(`/api/login`).send(loginData);
     const loginResource = response.body as LoginResource;
     token = loginResource.access_token;
     expect(token).toBeDefined();
@@ -45,7 +45,7 @@ describe("user POST", () => {
 
 
         const jane: UserResource = { name: "Jane", email: "jane@doe.de", password: "abcdefghiJkl1$", admin: false };
-        const response = await request.post(`/user`)
+        const response = await request.post(`/api/user`)
             .set("Authorization", `Bearer ${token}`)
             .send(jane)
         const janeModel = await User.findOne({ email: "jane@doe.de" });
@@ -60,7 +60,7 @@ describe("user POST", () => {
     test("negativtest duplicate email", async () => {
         const request = supertest(app);
         const jane: UserResource = { name: "jane", email: "john@doe.de", password: "abcdefghiJkl1$", admin: false };
-        const response = await request.post(`/user`)
+        const response = await request.post(`/api/user`)
             .send(jane)
             .set("Authorization", `Bearer ${token}`)
         expect(response.statusCode).toBe(400);
@@ -72,7 +72,7 @@ describe("user PUT ", () => {
         const request = supertest(app);
         const update: UserResource = { id: john.id, name: "Jane", email: "jane@doe.de", admin: false }
 
-        const response = await request.put(`/user/${update.id}`)
+        const response = await request.put(`/api/user/${update.id}`)
             .set("Authorization", `Bearer ${token}`)
             .send(update);
 
@@ -85,7 +85,7 @@ describe("user PUT ", () => {
         const request = supertest(app);
         const update: UserResource = { id: john.id, name: "jane", email: "jane@doe.de", admin: false }
 
-        const response = await request.put(`/user/${NON_EXISTING_ID}`)
+        const response = await request.put(`/api/user/${NON_EXISTING_ID}`)
             .set("Authorization", `Bearer ${token}`)
             .send(update);
         expect(response.statusCode).toBe(400);
@@ -95,7 +95,7 @@ describe("user PUT ", () => {
         const request = supertest(app);
         const update: UserResource = { id: john.id, name: "Ali", email: "jane@doe.de", admin: false }
 
-        const response = await request.put(`/user/${update.id}`)
+        const response = await request.put(`/api/user/${update.id}`)
             .set("Authorization", `Bearer ${token}`)
             .send(update);
         expect(response.statusCode).toBe(400);
@@ -105,7 +105,7 @@ describe("user PUT ", () => {
         const request = supertest(app);
         const update: UserResource = { id: john.id, name: "Mark", email: "mike@doe.de", admin: false }
 
-        const response = await request.put(`/user/${ali.id}`)
+        const response = await request.put(`/api/user/${ali.id}`)
             .set("Authorization", `Bearer ${token}`)
             .send(update);
         expect(response.statusCode).toBe(400);
@@ -116,12 +116,12 @@ describe("user PUT ", () => {
         const request = supertest(app);
         const update: UserResource = { id: john.id, name: "Jane", email: "jane@doe.de", admin: false }
         const loginData = { email: "john@doe.de", password: "abcdefghiJkl1$"};
-        const res = await request.post(`/login`).send(loginData);
+        const res = await request.post(`/api/login`).send(loginData);
         const loginResource = res.body as LoginResource;
         let tokenJohn = loginResource.access_token;
         expect(tokenJohn).toBeDefined();
 
-        const response = await request.put(`/user/${update.id}`)
+        const response = await request.put(`/api/user/${update.id}`)
             .set("Authorization", `Bearer ${tokenJohn}`)
             .send(update);
 
@@ -132,7 +132,7 @@ describe("user PUT ", () => {
 describe("user DELETE", () => {
     test(" Positivtest", async () => {
         const request = supertest(app);
-        const response = await request.delete(`/user/${john.id}`)
+        const response = await request.delete(`/api/user/${john.id}`)
             .set("Authorization", `Bearer ${token}`)
 
         expect(response.statusCode).toBe(204);
@@ -140,7 +140,7 @@ describe("user DELETE", () => {
 
     test(" Negativetest non existend ID", async () => {
         const request = supertest(app);
-        const response = await request.delete(`/user/${NON_EXISTING_ID}`)
+        const response = await request.delete(`/api/user/${NON_EXISTING_ID}`)
             .set("Authorization", `Bearer ${token}`)
 
         expect(response.statusCode).toBe(400);
@@ -148,7 +148,7 @@ describe("user DELETE", () => {
 
     test("User tries do delete itslef", async () => {
         const request = supertest(app);
-        const response = await request.delete(`/user/${jj.id}`)
+        const response = await request.delete(`/api/user/${jj.id}`)
             .set("Authorization", `Bearer ${token}`)
             expect(response.statusCode).toBe(403);
     });
@@ -160,7 +160,7 @@ describe("user reqAuth", () => {
     test("Undefined token", async () => {
         const request = supertest(app);
         const jane: UserResource = { name: "Jane", email: "jane@doe.de", password: "abcdefghiJkl1$", admin: false };
-        const response = await request.post(`/user`)
+        const response = await request.post(`/api/user`)
             .set("Authorization", `Bearer ${undefined}`)
             .send(jane)
         expect(response).not.statusCode(400);
@@ -171,7 +171,7 @@ describe("user reqAuth", () => {
     test("Wrong token", async () => {
         const request = supertest(app);
         const jane: UserResource = { name: "Jane", email: "jane@doe.de", password: "abcdefghiJkl1$", admin: false };
-        const response = await request.post(`/user`)
+        const response = await request.post(`/api/user`)
             .set("Authorization", `Bearer ${"eyundefinedsddsdv2342d"}`)
             .send(jane)
         expect(response).not.statusCode(400);
@@ -183,7 +183,7 @@ describe("user reqAuth", () => {
 describe("users optAuth", () => {
     test("no authentication, should be status 401", async () => {
         const request = supertest(app);
-        const response = await request.get(`/users`);
+        const response = await request.get(`/api/users`);
         expect(response).not.statusCode(400);
         expect(response).not.statusCode(404);
         expect(response.statusCode).toBe(401);
@@ -191,7 +191,7 @@ describe("users optAuth", () => {
 
     test("with authentication, should still return list", async () => {
         const request = supertest(app);
-        const response = await request.get(`/users`)
+        const response = await request.get(`/api/users`)
             .set("Authorization", `Bearer ${token}`)
         expect(response.statusCode).toBe(200)
         expect(response).not.statusCode("40x")

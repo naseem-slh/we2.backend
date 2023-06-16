@@ -26,7 +26,7 @@ describe("login POST", () => {
     it("should be a positive login", async () => {
         const request = supertest(app);
         const loginData = { email: "john@some-host.de", password: strongPW };
-        const response = await request.post(`/login`).send(loginData);
+        const response = await request.post(`/api/login`).send(loginData);
         const loginResource = response.body as LoginResource;
         const token = loginResource.access_token;
         expect(token).toBeDefined();
@@ -35,27 +35,27 @@ describe("login POST", () => {
     it("negative, false email", async () => {
         const request = supertest(app)
         const loginData = { email: "johnnyt.de", password: strongPW }
-        const response = await request.post(`/login`).send(loginData)
+        const response = await request.post(`/api/login`).send(loginData)
         expect(response.statusCode).toBe(401)
     })
 
     it("negative, false password", async () => {
         const request = supertest(app)
         const loginData = { email: "john@some-host.de", password: strongPW + "1"}
-        const response = await request.post(`/login`).send(loginData)
+        const response = await request.post(`/api/login`).send(loginData)
         expect(response.statusCode).toBe(401)
     })
     it("negative, non string password", async () => {
         const request = supertest(app)
         const loginData = { email: "john@some-host.de", password: 1244}
-        const response = await request.post(`/login`).send(loginData)
+        const response = await request.post(`/api/login`).send(loginData)
         expect(response.statusCode).toBe(400)
     })
 
     it("negative, weak password", async () => {
         const request = supertest(app)
         const loginData = { email: "john@some-host.de", password: "ssd1"}
-        const response = await request.post(`/login`).send(loginData)
+        const response = await request.post(`/api/login`).send(loginData)
         expect(response.statusCode).toBe(400)
     })
 

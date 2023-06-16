@@ -20,7 +20,7 @@ beforeEach(async () => {
     // Login um Token zu erhalten
     const request = supertest(app);
     const loginData = { email: "john@some-host.de", password: "123asdf!ABCD" };
-    const response = await request.post(`/login`).send(loginData);
+    const response = await request.post(`/api/login`).send(loginData);
     const loginResource = response.body as LoginResource;
     token = loginResource.access_token;
     expect(token).toBeDefined();
@@ -32,7 +32,7 @@ afterAll(async () => {
 
 test("users GET, Positivtest", async () => {
     const request = supertest(app);
-    const response = await request.get(`/users`)
+    const response = await request.get(`/api/users`)
     .set("Authorization", `Bearer ${token}`)
     expect(response.statusCode).toBe(200);
 
