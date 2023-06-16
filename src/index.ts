@@ -9,9 +9,14 @@ import { logger } from "./logger"
 
 import dotenv from "dotenv";
 import { readFile } from "fs/promises";
+import { prefillDB } from "./move_to_we2.backend/prefill";
 dotenv.config() // read ".env"
 
 async function setup() {
+    
+    if (process.env.DB_PREFILL == "true") {
+        prefillDB();
+    }
 
     let mongodURI = process.env.DB_CONNECTION_STRING;
     if (!mongodURI) {
@@ -35,7 +40,7 @@ async function setup() {
             readFile(process.env.SSL_KEY_FILE!),
             readFile(process.env.SSL_CERT_FILE!)]);
 
-        const httpsPort = process.env.HTTPS_PORT? parseInt(process.env.HTTPS_PORT) : 3001;
+        const httpsPort = process.env.HTTPS_PORT ? parseInt(process.env.HTTPS_PORT) : 3001;
         const httpsServer = https.createServer({ key: privateSSLKey, cert: publicSSLCert }, app);
         httpsServer.listen(httpsPort, () => {
             console.log(`Listening for HTTPS at https://localhost:${httpsPort}`);

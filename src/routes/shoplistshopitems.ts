@@ -8,7 +8,7 @@ import { getShopList } from "../services/ShopListService";
 
 const shopListShopItemsRouter = express.Router();
 
-shopListShopItemsRouter.get("/shoplist/:id/shopitems",
+shopListShopItemsRouter.get("/api/shoplist/:id/shopitems",
     requiresAuthentication,
     param('id').isMongoId(),
     async (req, res, next) => {

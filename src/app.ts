@@ -16,15 +16,15 @@ app.use('*', express.json())
 
 // Routes
 app.use(shopListShopItemsRouter) // wird hier ohne Präfix registriert, da er bereits einen Präfix hat (dies ist aber die Ausnahme)
-app.use("/login", loginRouter)   // wird erst später implementiert, hier nur Dummy; hat aber bereits einen Präfix
+app.use("/api/login", loginRouter)   // wird erst später implementiert, hier nur Dummy; hat aber bereits einen Präfix
 
 // Registrieren Sie hier die weiteren Router (mit Pfad-Präfix):
-app.use("/users",usersRouter)
-app.use("/user",userRouter)
-app.use("/shoplist",shopListRouter)
-app.use("/shopper", shopperRouter)
-app.use("/shopitem",shopItemRouter)
-app.use("/login",loginRouter)
+app.use("/api/users",usersRouter)
+app.use("/api/user",userRouter)
+app.use("/api/shoplist",shopListRouter)
+app.use("/api/shopper", shopperRouter)
+app.use("/api/shopitem",shopItemRouter)
+app.use("/api/login",loginRouter)
 
 
 export default app;
